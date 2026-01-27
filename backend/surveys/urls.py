@@ -17,6 +17,7 @@ from .views import (
     admin_surveys_overview_view,
     admin_users_view,
     admin_session_view,
+    health_check_view,
 )
 
 router = DefaultRouter()
@@ -32,6 +33,7 @@ urlpatterns = [
     path("admin/surveys-overview/", admin_surveys_overview_view, name="admin-surveys-overview"),
     path("admin/users/", admin_users_view, name="admin-users"),
     path("admin/session/", admin_session_view, name="admin-session"),
+    path("health/", health_check_view, name="health-check"),
     path("auth/login/", login_view),
     path("surveys/active/", ActiveSurveyListView.as_view()),
     path("surveys/active/<slug:slug>/", ActiveSurveyDetailView.as_view()),

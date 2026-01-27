@@ -1,3 +1,7 @@
+import os
+
+from django.conf import settings
+from django.db import connection
 from django.db.models import Avg, Count, Q
 from django.db.models.functions import TruncDate
 from rest_framework import generics, status, viewsets, filters
@@ -195,6 +199,34 @@ def admin_users_view(request):
 def admin_session_view(request):
     login(request, request.user)
     return DRFResponse({"ok": True})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def health_check_view(request):
+    token = os.environ.get("HEALTHCHECK_TOKEN")
+    key = request.query_params.get("key", "")
+    if not settings.DEBUG and (not token or key != token):
+        return DRFResponse({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    payload = {"ok": True}
+    try:
+        connection.ensure_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        payload["database"] = "ok"
+    except Exception as exc:
+        payload["ok"] = False
+        payload["database"] = "error"
+        payload["error"] = f"{type(exc).__name__}: {exc}"
+
+    try:
+        payload["surveys_count"] = Survey.objects.count()
+    except Exception as exc:
+        payload["ok"] = False
+        payload["surveys_count_error"] = f"{type(exc).__name__}: {exc}"
+
+    return DRFResponse(payload)
 
 
 @api_view(["POST"])

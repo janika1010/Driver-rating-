@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,7 +11,10 @@ def _env_list(name: str, default: list[str] | None = None) -> list[str]:
     return default or []
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "m5@E9w4v2r!t8Qp6Yz1Nf7sX0kL3cV9uB5dR2gH8jK4eP6mT1x",
+)
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes", "on")
 ALLOWED_HOSTS: list[str] = _env_list("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
@@ -65,10 +69,10 @@ WSGI_APPLICATION = "driver_rating.wsgi.application"
 ASGI_APPLICATION = "driver_rating.asgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
