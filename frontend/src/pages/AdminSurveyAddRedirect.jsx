@@ -12,8 +12,10 @@ export default function AdminSurveyAddRedirect() {
       } catch (err) {
         // Ignore session errors and continue loading the admin page.
       }
-      const host = window.location.hostname || "localhost";
-      const adminBase = (import.meta.env.VITE_ADMIN_BASE || `http://${host}:8000`).replace(/\/$/, "");
+      // Use explicit admin base URL when provided; fall back to local dev server.
+      const adminBase = (
+        import.meta.env.VITE_ADMIN_BASE || "http://localhost:8000"
+      ).replace(/\/$/, "");
       setIframeSrc(`${adminBase}/admin/surveys/survey/add/?embed=1`);
     };
     prepare();
