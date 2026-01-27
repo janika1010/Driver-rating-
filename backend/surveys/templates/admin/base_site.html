@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+  (function () {
+    try {
+      if (window.self !== window.top) {
+        document.documentElement.classList.add("admin-embedded");
+        document.body.classList.add("admin-embedded");
+      }
+    } catch (err) {
+      document.documentElement.classList.add("admin-embedded");
+      document.body.classList.add("admin-embedded");
+    }
+  })();
+</script>
+{% endblock %}
+
+{% block bodyclass %}
+{{ block.super }}{% if request.GET.embed %} admin-embedded{% endif %}
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{{ frontend_admin_dashboard_url }}" target="_top">Driver rating system</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content_container %}
+<div id="main">
+    <nav id="left-sidebar">
+        <div class="sidebar-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            Nexpress
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'admin-dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'admin:surveys_survey_changelist' %}">Surveys</a></li>
+            <li><a href="{% url 'admin:surveys_driver_changelist' %}">Drivers</a></li>
+            <li><a href="{% url 'admin:auth_user_changelist' %}">Users</a></li>
+        </ul>
+    </nav>
+    <div id="content" class="colMS">
+        {% block content %}{{ content }}{% endblock %}
+    </div>
+</div>
+{% endblock %}

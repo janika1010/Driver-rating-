@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+
+{% block content_title %}
+  <h1>Хэрэглэгчийн жагсаалт</h1>
+{% endblock %}
+
+{% block object-tools-items %}
+  {% if has_add_permission %}
+    <li>
+      <a href="{% url 'admin:auth_user_add' %}" class="addlink">Хэрэглэгч нэмэх</a>
+    </li>
+  {% endif %}
+{% endblock %}

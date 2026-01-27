@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="card" style="padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <form method="get" style="display: flex; gap: 10px; align-items: center;">
+            <label>Санал асуулга сонгох:</label>
+            <select name="survey_id" onchange="this.form.submit()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="">--- Сонгох ---</option>
+                {% for s in surveys %}
+                <option value="{{ s.id }}" {% if s.id|stringformat:"s" == selected_survey_id %}selected{% endif %}>{{ s.title }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if results %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="card" style="padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f9f9f9;">
+            <h3>Ерөнхий үнэлгээ</h3>
+            <div style="font-size: 36px; font-weight: bold; color: #FFD336;">{{ results.rating_avg|stringformat:".2f" }} / 5.0</div>
+        </div>
+
+        <div class="card" style="padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h3>Жолооч нарын үзүүлэлт</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee; text-align: left;">
+                        <th style="padding: 10px;">Жолооч</th>
+                        <th style="padding: 10px;">Машины дугаар</th>
+                        <th style="padding: 10px;">Санал</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in results.drivers %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">{{ d.driver__name }}</td>
+                        <td style="padding: 10px;">{{ d.driver__car_number|default:"-" }}</td>
+                        <td style="padding: 10px;">{{ d.response_count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align: center;">Санал ирээгүй байна.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div style="padding: 40px; text-align: center; color: #666;">
+        Дээрх цэснээс санал асуулга сонгож үр дүнг үзнэ үү.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

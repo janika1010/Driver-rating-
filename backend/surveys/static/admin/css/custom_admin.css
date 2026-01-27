@@ -1,0 +1,132 @@
+:root {
+    --header-bg: #FFD336;
+    --header-color: #000000;
+    --header-link-color: #000000;
+}
+
+#header {
+    background: #FFD336 !important;
+    color: #ffffff !important;
+    height: 60px !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.admin-embedded #header,
+html.admin-embedded #header,
+body.admin-embedded #header {
+    display: none !important;
+}
+
+#header a:link, #header a:visited {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+#branding h1 {
+    color: #ffffff !important;
+    margin: 0 !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
+#branding {
+    margin-left: 5%;
+}
+
+#user-tools, .theme-toggle, .header-actions {
+    display: none !important;
+}
+
+/* Layout шинэчлэл */
+#container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#main {
+    display: flex !important;
+    flex: 1;
+    overflow: hidden;
+}
+
+#left-sidebar {
+    width: 220px;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-brand {
+    padding: 0 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sidebar-menu li a:hover {
+    background: #f7f7f8;
+    color: #000;
+}
+
+#content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px !important;
+    background: #ffffff;
+}
+
+/* Хуучин breadcrumbs болон бусад зүйлсийг засах */
+.breadcrumbs {
+    background: none !important;
+    border: none !important;
+    padding: 0 0 20px 0 !important;
+}
+
+.submit-row {
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+#toolbar {
+    clear: both;
+}
+
+.object-tools {
+    float: right;
+    margin: 0 0 8px 0 !important;
+}
+
+#changelist-filter {
+    display: none !important;
+}
+
+.actions {
+    display: none !important;
+}
+
+.action-checkbox,
+.action-checkbox-column {
+    display: none !important;
+}
