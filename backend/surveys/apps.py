@@ -34,16 +34,16 @@ class SurveysConfig(AppConfig):
             # If a user with this username exists, ensure they are admin and update password
             user, created = User.objects.get_or_create(
                 username=username,
-                defaults={"email": email},
+                defaults={"email": email, "is_staff": True, "is_superuser": True},
             )
-        except (OperationalError, ProgrammingError):
-            # Database tables (e.g. auth_user) not ready yet – happens before first migrate
-            return
-
-        if created or not user.is_superuser or not user.is_staff:
-            user.is_staff = True
-            user.is_superuser = True
+            # Always ensure admin status and update password
+            if not user.is_staff or not user.is_superuser:
+                user.is_staff = True
+                user.is_superuser = True
             user.set_password(password)
             if email and not user.email:
                 user.email = email
-            user.save()
+            user.save(update_fields=["is_staff", "is_superuser", "password", "email"])
+        except (OperationalError, ProgrammingError):
+            # Database tables (e.g. auth_user) not ready yet – happens before first migrate
+            return
