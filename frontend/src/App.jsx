@@ -13,6 +13,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/admin" replace />} />
       <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/surveys" element={<AdminSurveys />} />
       <Route path="/admin/surveys/survey/add" element={<AdminSurveyAddRedirect />} />
