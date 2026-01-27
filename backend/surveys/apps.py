@@ -1,6 +1,7 @@
 import os
 
 from django.apps import AppConfig
+from django.db.utils import OperationalError, ProgrammingError
 
 
 class SurveysConfig(AppConfig):
@@ -29,11 +30,16 @@ class SurveysConfig(AppConfig):
 
         User = get_user_model()
 
-        # If a user with this username exists, ensure they are admin and update password
-        user, created = User.objects.get_or_create(
-            username=username,
-            defaults={"email": email},
-        )
+        try:
+            # If a user with this username exists, ensure they are admin and update password
+            user, created = User.objects.get_or_create(
+                username=username,
+                defaults={"email": email},
+            )
+        except (OperationalError, ProgrammingError):
+            # Database tables (e.g. auth_user) not ready yet – happens before first migrate
+            return
+
         if created or not user.is_superuser or not user.is_staff:
             user.is_staff = True
             user.is_superuser = True
