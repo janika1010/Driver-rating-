@@ -115,6 +115,10 @@ CORS_ALLOWED_ORIGINS = _env_list(
 
 CORS_ALLOW_CREDENTIALS = True
 
+# As a fallback for hosting quirks, allow all origins if explicitly enabled
+if os.environ.get("CORS_ALLOW_ALL_ORIGINS", "").lower() in ("1", "true", "yes", "on"):
+    CORS_ALLOW_ALL_ORIGINS = True
+
 CSRF_TRUSTED_ORIGINS = _env_list("CSRF_TRUSTED_ORIGINS", CORS_ALLOWED_ORIGINS)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
