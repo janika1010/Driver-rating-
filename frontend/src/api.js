@@ -19,6 +19,19 @@ export async function apiRequest(path, options = {}) {
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+
+    // Token хүчингүй болсон үед автоматаар logout хийнэ
+    if (response.status === 401 && typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_username");
+      } catch {
+        // ignore storage errors
+      }
+      // Login хуудас руу буцаана
+      window.location.href = "/admin";
+    }
+
     throw new Error(error.detail || "Request failed");
   }
   return response.json();
