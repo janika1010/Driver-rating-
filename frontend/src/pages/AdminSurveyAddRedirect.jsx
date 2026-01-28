@@ -1,33 +1,20 @@
-import { useEffect, useState } from "react";
-import { apiRequest } from "../api.js";
+import { useMemo } from "react";
 import AdminSidebar from "../components/AdminSidebar.jsx";
 
 export default function AdminSurveyAddRedirect() {
-  const [iframeSrc, setIframeSrc] = useState("");
+  const adminAddUrl = useMemo(() => {
+    const defaultAdminBase =
+      window.location.hostname.endsWith("vercel.app") ||
+      window.location.hostname === "drivers-rating.vercel.app"
+        ? "https://driver-rating-production.up.railway.app"
+        : "http://localhost:8000";
 
-  useEffect(() => {
-    const prepare = async () => {
-      try {
-        await apiRequest("/admin/session/", { method: "POST" });
-      } catch (err) {
-        // Ignore session errors and continue loading the admin page.
-      }
-      // Use explicit admin base URL when provided.
-      // If not provided (common in Vercel misconfig), default to Railway in production
-      // and localhost in local dev.
-      const defaultAdminBase =
-        window.location.hostname.endsWith("vercel.app") ||
-        window.location.hostname === "drivers-rating.vercel.app"
-          ? "https://driver-rating-production.up.railway.app"
-          : "http://localhost:8000";
+    const adminBase = (import.meta.env.VITE_ADMIN_BASE || defaultAdminBase).replace(
+      /\/$/,
+      ""
+    );
 
-      const adminBase = (import.meta.env.VITE_ADMIN_BASE || defaultAdminBase).replace(
-        /\/$/,
-        ""
-      );
-      setIframeSrc(`${adminBase}/admin/surveys/survey/add/?embed=1`);
-    };
-    prepare();
+    return `${adminBase}/admin/surveys/survey/add/`;
   }, []);
 
   return (
@@ -40,15 +27,17 @@ export default function AdminSurveyAddRedirect() {
         <main className="admin-content">
           <h2>Судалгаа нэмэх</h2>
           <div className="card">
-            {iframeSrc ? (
-              <iframe
-                className="admin-iframe"
-                src={iframeSrc}
-                title="Survey add"
-              />
-            ) : (
-              <div>Loading...</div>
-            )}
+            <p style={{ marginTop: 0 }}>
+              Судалгаа нэмэх хуудас шинэ tab дээр нээгдэнэ.
+            </p>
+            <a
+              className="link-button"
+              href={adminAddUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Django admin дээр нээх
+            </a>
           </div>
         </main>
       </div>
