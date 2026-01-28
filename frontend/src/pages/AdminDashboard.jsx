@@ -122,31 +122,6 @@ export default function AdminDashboard() {
     URL.revokeObjectURL(url);
   };
 
-  const deleteDashboardData = async () => {
-    const confirmed = window.confirm(
-      "Судалгаа бөглөсөн өгөгдлийг устгах уу? Энэ үйлдэл буцаахгүй."
-    );
-    if (!confirmed) return;
-    setDashboardStatus({ loading: true, error: "" });
-    try {
-      const result = await apiRequest("/admin/responses/delete/", {
-        method: "POST",
-        body: JSON.stringify({
-          survey_id: surveyFilter || null,
-          driver_id: driverFilter || null,
-        }),
-      });
-      await loadDashboardTable();
-      if (result.deleted_responses) {
-        window.alert(`${result.deleted_responses} өгөгдөл устгалаа.`);
-      } else {
-        window.alert("Устгах өгөгдөл олдсонгүй.");
-      }
-    } catch (err) {
-      setDashboardStatus({ loading: false, error: err.message });
-    }
-  };
-
   return (
     <div className="admin-shell">
       <header className="admin-header">
@@ -196,14 +171,6 @@ export default function AdminDashboard() {
                 disabled={dashboardStatus.loading || !dashboardRows.length}
               >
                 Мэдээлэл татах
-              </button>
-              <button
-                type="button"
-                className="danger"
-                onClick={deleteDashboardData}
-                disabled={dashboardStatus.loading}
-              >
-                Өгөгдөл устгах
               </button>
             </div>
             {surveyStatus.error && <div className="error">{surveyStatus.error}</div>}
