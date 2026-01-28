@@ -34,7 +34,7 @@ main {
 .admin-shell {
   display: flex;
   flex-direction: column;
-  background: #f7f7f8;
+  background: #ffffff;
 }
 
 .admin-body {
