@@ -15,12 +15,18 @@ export default function AdminLogin() {
     event.preventDefault();
     setError("");
     try {
+      // Use FormData so browser autofill is captured reliably
+      const formData = new FormData(event.currentTarget);
+      const username = String(formData.get("username") || "").trim();
+      const password = String(formData.get("password") || "");
+      const payload = { username, password };
+
       const data = await apiRequest("/auth/login/", {
         method: "POST",
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       localStorage.setItem("admin_token", data.token);
-      localStorage.setItem("admin_username", data.username || form.username);
+      localStorage.setItem("admin_username", data.username || username);
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message);
@@ -38,6 +44,7 @@ export default function AdminLogin() {
               name="username"
               value={form.username}
               onChange={handleChange}
+              autoComplete="username"
               required
             />
           </div>
@@ -48,6 +55,7 @@ export default function AdminLogin() {
               type="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="current-password"
               required
             />
           </div>
