@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api.js";
 import AdminSidebar from "../components/AdminSidebar.jsx";
-import AdminLogoutButton from "../components/AdminLogoutButton.jsx";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -241,7 +240,6 @@ export default function AdminUsers() {
           </div>
         </main>
       </div>
-      <AdminLogoutButton />
     </div>
   );
 }

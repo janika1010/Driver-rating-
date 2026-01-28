@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../api.js";
 import QRCode from "qrcode";
 import AdminSidebar from "../components/AdminSidebar.jsx";
-import AdminLogoutButton from "../components/AdminLogoutButton.jsx";
 
 export default function AdminSurveys() {
   const navigate = useNavigate();
@@ -167,7 +166,6 @@ export default function AdminSurveys() {
           </div>
         </main>
       </div>
-      <AdminLogoutButton />
     </div>
   );
 }

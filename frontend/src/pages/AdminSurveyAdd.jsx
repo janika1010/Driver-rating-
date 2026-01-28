@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../api.js";
 import AdminSidebar from "../components/AdminSidebar.jsx";
-import AdminLogoutButton from "../components/AdminLogoutButton.jsx";
 
 const QUESTION_TYPES = [
   { value: "rating", label: "1-5 үнэлгээ" },
@@ -305,7 +304,6 @@ export default function AdminSurveyAdd() {
           </div>
         </main>
       </div>
-      <AdminLogoutButton />
     </div>
   );
 }
