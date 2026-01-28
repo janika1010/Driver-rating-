@@ -91,11 +91,6 @@ main {
   gap: 6px;
 }
 
-.admin-menu-bottom {
-  margin-top: auto;
-  padding-top: 12px;
-}
-
 .admin-menu a,
 .admin-menu-logout {
   display: block;

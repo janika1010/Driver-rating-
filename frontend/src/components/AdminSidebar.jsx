@@ -48,8 +48,6 @@ export default function AdminSidebar() {
           <span className="menu-icon" aria-hidden="true">👤</span>
           Users
           </Link>
-        </div>
-        <div className="admin-menu-bottom">
           <button type="button" className="admin-menu-logout" onClick={handleLogout}>
             <span className="menu-icon" aria-hidden="true">🚪</span>
             Logout
