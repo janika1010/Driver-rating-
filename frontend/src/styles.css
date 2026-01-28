@@ -35,11 +35,13 @@ main {
   display: flex;
   flex-direction: column;
   background: #ffffff;
+  min-height: 100vh;
 }
 
 .admin-body {
   display: flex;
   flex: 1;
+  min-height: 0;
   min-width: 0;
 }
 
@@ -48,7 +50,6 @@ main {
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   padding: 0 0 24px;
-  min-height: 100vh;
 }
 
 .admin-user {
