@@ -12,10 +12,19 @@ export default function AdminSurveyAddRedirect() {
       } catch (err) {
         // Ignore session errors and continue loading the admin page.
       }
-      // Use explicit admin base URL when provided; fall back to local dev server.
-      const adminBase = (
-        import.meta.env.VITE_ADMIN_BASE || "http://localhost:8000"
-      ).replace(/\/$/, "");
+      // Use explicit admin base URL when provided.
+      // If not provided (common in Vercel misconfig), default to Railway in production
+      // and localhost in local dev.
+      const defaultAdminBase =
+        window.location.hostname.endsWith("vercel.app") ||
+        window.location.hostname === "drivers-rating.vercel.app"
+          ? "https://driver-rating-production.up.railway.app"
+          : "http://localhost:8000";
+
+      const adminBase = (import.meta.env.VITE_ADMIN_BASE || defaultAdminBase).replace(
+        /\/$/,
+        ""
+      );
       setIframeSrc(`${adminBase}/admin/surveys/survey/add/?embed=1`);
     };
     prepare();
