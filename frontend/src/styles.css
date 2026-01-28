@@ -82,9 +82,22 @@ main {
   flex-direction: column;
   gap: 6px;
   padding: 16px 12px 0;
+  height: 100%;
 }
 
-.admin-menu a {
+.admin-menu-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-menu-bottom {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.admin-menu a,
+.admin-menu-logout {
   display: block;
   padding: 10px 12px;
   border-radius: 8px;
@@ -98,6 +111,17 @@ main {
 }
 
 .admin-menu a:hover {
+  background: #FFD336;
+  color: #000000;
+}
+
+.admin-menu-logout {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-menu-logout:hover {
   background: #FFD336;
   color: #000000;
 }
@@ -182,7 +206,7 @@ main.admin-content {
 
 .admin-logout-button {
   position: fixed;
-  right: 24px;
+  left: 24px;
   bottom: 24px;
   z-index: 1000;
   background: #2563eb;
