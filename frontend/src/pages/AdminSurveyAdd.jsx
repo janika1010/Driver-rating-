@@ -11,7 +11,7 @@ const QUESTION_TYPES = [
 ];
 
 function newQuestion(order) {
-  return { text: "", question_type: "rating", is_required: true, order };
+  return { text: "", question_type: "rating", is_required: true, order, choices: [] };
 }
 
 export default function AdminSurveyAdd() {
@@ -38,6 +38,44 @@ export default function AdminSurveyAdd() {
     );
   };
 
+  const addChoice = (qIndex) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === qIndex
+          ? {
+              ...q,
+              choices: [...(q.choices || []), { text: "", order: (q.choices || []).length }],
+            }
+          : q
+      )
+    );
+  };
+
+  const updateChoice = (qIndex, cIndex, patch) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === qIndex
+          ? {
+              ...q,
+              choices: (q.choices || []).map((c, j) =>
+                j === cIndex ? { ...c, ...patch } : c
+              ),
+            }
+          : q
+      )
+    );
+  };
+
+  const removeChoice = (qIndex, cIndex) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === qIndex
+          ? { ...q, choices: (q.choices || []).filter((_, j) => j !== cIndex) }
+          : q
+      )
+    );
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
@@ -52,6 +90,15 @@ export default function AdminSurveyAdd() {
             question_type: q.question_type || "rating",
             is_required: Boolean(q.is_required),
             order: Number.isFinite(Number(q.order)) ? Number(q.order) : idx,
+            choices:
+              q.question_type === "single" || q.question_type === "multi"
+                ? (q.choices || [])
+                    .map((c, cIdx) => ({
+                      text: (c.text || "").trim(),
+                      order: Number.isFinite(Number(c.order)) ? Number(c.order) : cIdx,
+                    }))
+                    .filter((c) => c.text)
+                : [],
           }))
           .filter((q) => q.text),
       };
@@ -173,6 +220,62 @@ export default function AdminSurveyAdd() {
                           </label>
                         </div>
                       </div>
+
+                      {(q.question_type === "single" || q.question_type === "multi") && (
+                        <div style={{ marginTop: 12 }}>
+                          <div className="admin-title-row" style={{ marginTop: 0 }}>
+                            <h4 style={{ margin: 0 }}>Сонголтууд</h4>
+                            <button
+                              type="button"
+                              className="secondary"
+                              onClick={() => addChoice(idx)}
+                            >
+                              Сонголт нэмэх
+                            </button>
+                          </div>
+                          {(q.choices || []).length === 0 ? (
+                            <div>Сонголт алга.</div>
+                          ) : (
+                            (q.choices || []).map((c, cIdx) => (
+                              <div
+                                key={`q-${idx}-c-${cIdx}`}
+                                className="grid grid-2"
+                                style={{ marginTop: 8 }}
+                              >
+                                <div>
+                                  <label>Сонголтын текст</label>
+                                  <input
+                                    value={c.text}
+                                    onChange={(e) =>
+                                      updateChoice(idx, cIdx, { text: e.target.value })
+                                    }
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label>Дараалал</label>
+                                  <input
+                                    type="number"
+                                    value={c.order}
+                                    onChange={(e) =>
+                                      updateChoice(idx, cIdx, { order: e.target.value })
+                                    }
+                                  />
+                                </div>
+                                <div className="card-actions" style={{ gridColumn: "1 / -1" }}>
+                                  <button
+                                    type="button"
+                                    className="danger"
+                                    onClick={() => removeChoice(idx, cIdx)}
+                                  >
+                                    Сонголт устгах
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
 
                       <div className="card-actions">
                         <button

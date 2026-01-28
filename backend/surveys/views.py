@@ -292,13 +292,30 @@ class SurveyAdminViewSet(viewsets.ModelViewSet):
                 text = (q.get("text") or "").strip()
                 if not text:
                     continue
-                Question.objects.create(
+
+                question = Question.objects.create(
                     survey=survey,
                     text=text,
                     question_type=q.get("question_type") or "rating",
                     is_required=bool(q.get("is_required", True)),
                     order=int(q.get("order", idx)),
                 )
+
+                # Support optional choice list for single/multi questions:
+                # "choices": [{"text": "...", "order": 0}, ...]
+                choices_payload = q.get("choices") or []
+                if isinstance(choices_payload, list):
+                    for c_idx, c in enumerate(choices_payload):
+                        if not isinstance(c, dict):
+                            continue
+                        c_text = (c.get("text") or "").strip()
+                        if not c_text:
+                            continue
+                        Choice.objects.create(
+                            question=question,
+                            text=c_text,
+                            order=int(c.get("order", c_idx)),
+                        )
 
         headers = self.get_success_headers(serializer.data)
         return DRFResponse(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
