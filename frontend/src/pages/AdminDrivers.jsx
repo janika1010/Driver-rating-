@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api.js";
 import AdminSidebar from "../components/AdminSidebar.jsx";
+import AdminLogoutButton from "../components/AdminLogoutButton.jsx";
 
 export default function AdminDrivers() {
   const [drivers, setDrivers] = useState([]);
@@ -244,6 +245,7 @@ export default function AdminDrivers() {
           </div>
         </main>
       </div>
+      <AdminLogoutButton />
     </div>
   );
 }

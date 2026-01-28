@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api.js";
 import AdminSidebar from "../components/AdminSidebar.jsx";
+import AdminLogoutButton from "../components/AdminLogoutButton.jsx";
 
 export default function AdminDashboard() {
   const [surveyOptions, setSurveyOptions] = useState([]);
@@ -261,6 +262,7 @@ export default function AdminDashboard() {
           </div>
         </main>
       </div>
+      <AdminLogoutButton />
     </div>
   );
 }
