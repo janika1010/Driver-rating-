@@ -258,6 +258,51 @@ class SurveyAdminViewSet(viewsets.ModelViewSet):
     serializer_class = SurveyAdminSerializer
     permission_classes = [IsAdminUser]
 
+    def create(self, request, *args, **kwargs):
+        """
+        Create a survey and (optionally) create questions in the same request.
+
+        Expected payload example:
+        {
+          "title": "...",
+          "description": "...",
+          "is_active": true,
+          "questions": [
+            {"text":"...", "question_type":"rating", "is_required": true, "order": 1},
+            ...
+          ]
+        }
+        """
+        payload = dict(request.data)
+
+        # Default new surveys to active unless explicitly set
+        if "is_active" not in payload:
+            payload["is_active"] = True
+
+        questions_payload = payload.pop("questions", None)
+
+        serializer = self.get_serializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        survey = serializer.save()
+
+        if isinstance(questions_payload, list):
+            for idx, q in enumerate(questions_payload):
+                if not isinstance(q, dict):
+                    continue
+                text = (q.get("text") or "").strip()
+                if not text:
+                    continue
+                Question.objects.create(
+                    survey=survey,
+                    text=text,
+                    question_type=q.get("question_type") or "rating",
+                    is_required=bool(q.get("is_required", True)),
+                    order=int(q.get("order", idx)),
+                )
+
+        headers = self.get_success_headers(serializer.data)
+        return DRFResponse(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     @action(detail=True, methods=["get"], permission_classes=[IsAdminUser])
     def results(self, request, pk=None):
         survey = self.get_object()
