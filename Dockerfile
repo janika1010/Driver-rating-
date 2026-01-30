@@ -11,4 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend /app
 
 ENV PORT=8000
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py ensure_superuser && gunicorn driver_rating.wsgi:application --bind 0.0.0.0:$PORT"]
+
+# Migration script with lock to prevent concurrent migrations
+COPY backend/scripts/run_migrations.sh /app/run_migrations.sh
+RUN chmod +x /app/run_migrations.sh
+
+CMD ["sh", "-c", "/app/run_migrations.sh && python manage.py ensure_superuser && gunicorn driver_rating.wsgi:application --bind 0.0.0.0:$PORT"]

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: driver-rating-backend
+    env: python
+    buildCommand: ""
+    startCommand: "gunicorn driver_rating.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+    # Postdeploy script runs migrations after deployment
+    postDeployCommand: "python manage.py migrate --noinput"

@@ -94,16 +94,21 @@ def admin_dashboard_table_view(request):
     survey_ids = {row["survey_id"] for row in count_list}
     driver_ids = {row["driver_id"] for row in count_list}
 
+    # Optimize: only fetch required fields
     survey_map = {
-        survey.id: survey.title for survey in Survey.objects.filter(id__in=survey_ids)
+        survey.id: survey.title 
+        for survey in Survey.objects.filter(id__in=survey_ids).only("id", "title")
     }
+    
+    # Optimize: only fetch required fields
     driver_map = {}
-    for driver in Driver.objects.filter(id__in=driver_ids):
+    for driver in Driver.objects.filter(id__in=driver_ids).only("id", "name", "last_name"):
         display = f"{driver.last_name} {driver.name}".strip() if driver.last_name else driver.name
         driver_map[driver.id] = display
 
+    # Optimize: only fetch required fields and limit to 8 questions per survey
     question_map = {}
-    questions = Question.objects.filter(survey_id__in=survey_ids).order_by("order", "id")
+    questions = Question.objects.filter(survey_id__in=survey_ids).only("id", "survey_id", "order").order_by("order", "id")
     for question in questions:
         question_list = question_map.setdefault(question.survey_id, [])
         if len(question_list) < 8:
@@ -115,6 +120,19 @@ def admin_dashboard_table_view(request):
     }
     question_ids = [q.id for question_list in question_map.values() for q in question_list]
 
+    # Pre-fetch IP addresses to avoid N+1 queries
+    response_keys = {(row["survey_id"], row["driver_id"]) for row in count_list}
+    ip_map = {}
+    if response_keys:
+        responses = Response.objects.filter(
+            survey_id__in=survey_ids,
+            driver_id__in=driver_ids
+        ).only("survey_id", "driver_id", "ip_address")
+        for response in responses:
+            key = (response.survey_id, response.driver_id)
+            if key in response_keys and response.ip_address:
+                ip_map[key] = response.ip_address
+
     rows = []
     row_map = {}
     for row in count_list:
@@ -124,13 +142,14 @@ def admin_dashboard_table_view(request):
             "survey": survey_map.get(row["survey_id"], ""),
             "driver": driver_map.get(row["driver_id"], ""),
             "response_count": row["total"],
-            "ip_address": "",
+            "ip_address": ip_map.get(key, ""),
             "answers": [[] for _ in range(8)],
         }
         rows.append(row_data)
         row_map[key] = row_data
 
     if question_ids:
+        # Optimize: use select_related and prefetch_related more efficiently
         answers = (
             Answer.objects.filter(
                 response__survey_id__in=survey_ids,
@@ -139,14 +158,19 @@ def admin_dashboard_table_view(request):
             )
             .select_related("response", "question")
             .prefetch_related("answer_choices__choice")
+            .only(
+                "response__survey_id",
+                "response__driver_id",
+                "question_id",
+                "rating_value",
+                "text_value"
+            )
         )
         for answer in answers:
             key = (answer.response.survey_id, answer.response.driver_id)
             row = row_map.get(key)
             if not row:
                 continue
-            if not row["ip_address"]:
-                row["ip_address"] = answer.response.ip_address or ""
             idx = index_map.get(key[0], {}).get(answer.question_id)
             if idx is None:
                 continue
@@ -176,7 +200,10 @@ def admin_responses_delete_view(request):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 def admin_surveys_overview_view(request):
-    surveys = Survey.objects.prefetch_related("questions").all()
+    # Optimize: only fetch required fields and prefetch questions efficiently
+    surveys = Survey.objects.prefetch_related("questions").only(
+        "id", "title", "description", "slug", "is_active"
+    ).all()
     serializer = SurveyOverviewSerializer(surveys, many=True)
     return DRFResponse(serializer.data)
 
@@ -254,7 +281,7 @@ def login_view(request):
 
 
 class SurveyAdminViewSet(viewsets.ModelViewSet):
-    queryset = Survey.objects.all()
+    queryset = Survey.objects.prefetch_related("questions__choices").all()
     serializer_class = SurveyAdminSerializer
     permission_classes = [IsAdminUser]
 
@@ -369,7 +396,7 @@ class ChoiceAdminViewSet(viewsets.ModelViewSet):
 
 
 class DriverAdminViewSet(viewsets.ModelViewSet):
-    queryset = Driver.objects.all()
+    queryset = Driver.objects.all().order_by("name", "last_name")
     serializer_class = DriverSerializer
     permission_classes = [IsAdminUser]
 
@@ -379,7 +406,7 @@ class ActiveSurveyListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Survey.objects.filter(is_active=True)
+        return Survey.objects.filter(is_active=True).prefetch_related("questions__choices")
 
 
 class ActiveSurveyDetailView(generics.RetrieveAPIView):
@@ -388,7 +415,7 @@ class ActiveSurveyDetailView(generics.RetrieveAPIView):
     lookup_field = "slug"
 
     def get_queryset(self):
-        return Survey.objects.filter(is_active=True)
+        return Survey.objects.filter(is_active=True).prefetch_related("questions__choices")
 
 
 class ActiveDriverListView(generics.ListAPIView):
@@ -396,7 +423,7 @@ class ActiveDriverListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = Driver.objects.filter(is_active=True)
+        queryset = Driver.objects.filter(is_active=True).order_by("name", "last_name")
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
